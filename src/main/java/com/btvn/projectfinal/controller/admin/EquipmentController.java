@@ -1,6 +1,5 @@
 package com.btvn.projectfinal.controller.admin;
 
-
 import com.btvn.projectfinal.model.dto.EquipmentDTO;
 import com.btvn.projectfinal.model.entity.Equipment;
 import com.btvn.projectfinal.service.EquipmentService;
@@ -22,7 +21,6 @@ import java.util.NoSuchElementException;
 @RequestMapping("/admin/equipment")
 @RequiredArgsConstructor
 public class EquipmentController {
-    // C4: crud thiết bị
     private final EquipmentService equipmentService;
 
     @GetMapping
@@ -40,29 +38,11 @@ public class EquipmentController {
         return "admin/equipment/list";
     }
 
-    // add
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("equipmentDTO", new EquipmentDTO());
         model.addAttribute("statuses", Equipment.EquipmentStatus.values());
         return "admin/equipment/form";
-    }
-
-    @PostMapping("/add")
-    public String add(
-            @Valid @ModelAttribute("equipmentDTO") EquipmentDTO dto,
-            BindingResult bindingResult,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("statuses", Equipment.EquipmentStatus.values());
-            return "admin/equipment/form";
-        }
-
-        equipmentService.save(dto);
-        redirectAttributes.addFlashAttribute("successMessage", "Thêm thiết bị thành công!");
-        return "redirect:/admin/equipment";
     }
 
     // edit
@@ -84,9 +64,8 @@ public class EquipmentController {
         return "admin/equipment/form";
     }
 
-    @PostMapping("/edit/{id}")
-    public String edit(
-            @PathVariable Long id,
+    @PostMapping("/save")
+    public String save(
             @Valid @ModelAttribute("equipmentDTO") EquipmentDTO dto,
             BindingResult bindingResult,
             Model model,
@@ -97,8 +76,14 @@ public class EquipmentController {
             return "admin/equipment/form";
         }
 
-        equipmentService.update(id, dto);
-        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thiết bị thành công!");
+        if (dto.getId() != null) {
+            equipmentService.update(dto.getId(), dto);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thiết bị thành công!");
+        } else {
+            equipmentService.save(dto);
+            redirectAttributes.addFlashAttribute("successMessage", "Thêm thiết bị thành công!");
+        }
+
         return "redirect:/admin/equipment";
     }
 

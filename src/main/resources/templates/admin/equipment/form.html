@@ -23,12 +23,12 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form th:action="${equipmentDTO.id != null}
-                                ? @{/admin/equipment/edit/{id}(id=${equipmentDTO.id})}
-                                : @{/admin/equipment/add}"
-                          th:object="${equipmentDTO}" method="post">
+                    <form th:action="@{/admin/equipment/save}"
+                          th:object="${equipmentDTO}"
+                          method="post">
 
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" th:field="*{id}">
 
                         <div class="mb-3">
                             <label class="form-label">Tên thiết bị <span class="text-danger">*</span></label>
