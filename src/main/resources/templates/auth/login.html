@@ -33,18 +33,28 @@ xmlns:th="http://www.thymeleaf.org">
                   method="post">
                 <div class="mb-3">
                     <label class="form-label">Tên đăng nhập</label>
-                    <input type="text" name="username" class="form-control"
-                           placeholder="Nhập tên đăng nhập"  autofocus>
+                    <input type="text"
+                           th:field="*{username}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
+                           placeholder="Nhập tên đăng nhập"
+                           autofocus>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
+                         th:errors="*{username}">
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Mật khẩu</label>
-                    <input type="password" name="password" class="form-control"
-                           placeholder="Nhập mật khẩu" >
+                    <input type="password"
+                           th:field="*{password}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                           placeholder="Nhập mật khẩu">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
+                         th:errors="*{password}">
+                    </div>
                 </div>
-
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-
                 <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
             </form>
 
