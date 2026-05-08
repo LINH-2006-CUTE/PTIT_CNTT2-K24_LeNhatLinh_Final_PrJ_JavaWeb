@@ -29,10 +29,10 @@ public class Equipment {
     private String description;
 
     @Column(nullable = false)
-    private Integer quantity = 0; // Số lượng trong kho
+    private Integer quantity = 0;
 
     @Column(length = 50)
-    private String unit; // Cái, Bộ, Chiếc...
+    private String unit;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

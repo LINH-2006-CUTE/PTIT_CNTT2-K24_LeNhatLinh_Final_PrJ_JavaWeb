@@ -18,9 +18,8 @@ xmlns:th="http://www.thymeleaf.org">
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body p-4">
-                    <h4 class="text-center mb-4">📝 Đăng ký tài khoản</h4>
+                    <h4 class="text-center mb-4">Đăng ký tài khoản</h4>
 
-                    <!-- Lỗi từ server (username trùng, password không khớp...) -->
                     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
                     <form th:action="@{/auth/register}" th:object="${registerDTO}" method="post">
@@ -75,11 +74,11 @@ xmlns:th="http://www.thymeleaf.org">
 
                         <!-- Phần chỉ hiện khi chọn STUDENT -->
                         <div id="studentFields" style="display: none">
-                            <div class="mb-3">
-                                <label class="form-label">Mã số sinh viên</label>
-                                <input type="text" th:field="*{studentId}" class="form-control"
-                                       placeholder="VD: 21110001">
-                            </div>
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Mã số sinh viên</label>-->
+<!--                                <input type="text" th:field="*{studentId}" class="form-control"-->
+<!--                                       placeholder="VD: 21110001">-->
+<!--                            </div>-->
 
                             <div class="mb-3">
                                 <label class="form-label">Khoa/Ngành</label>

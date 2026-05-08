@@ -10,8 +10,6 @@ import jakarta.validation.constraints.Pattern;
 @Data
 public class RegisterDTO {
     @NotBlank(message = "Tên đăng nhập không được để trống")
-    @Size(min = 4, max = 50, message = "Tên đăng nhập từ 4-50 ký tự")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Chỉ được dùng chữ, số và dấu _")
     private String username;
 
     @NotBlank(message = "Mật khẩu không được để trống")
@@ -27,7 +25,6 @@ public class RegisterDTO {
     @NotNull(message = "Vui lòng chọn vai trò")
     private User.Role role;
 
-    // Chỉ bắt buộc nếu role = STUDENT
     private String studentId;
     private Long departmentId;
 }

@@ -1,9 +1,7 @@
 <!doctype html>
-<html lang="en"
-xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en">
 <head>
-    <title>Lecturer</title>
+    <title>Title</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,35 +11,23 @@ xmlns:th="http://www.thymeleaf.org"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-success px-3">
-    <span class="navbar-brand">📚 Cổng Giảng viên</span>
-    <div class="d-flex align-items-center gap-3">
-        <span class="text-white" sec:authentication="name"></span>
-        <form th:action="@{/auth/logout}" method="post" class="mb-0">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <button class="btn btn-outline-light btn-sm">Đăng xuất</button>
-        </form>
-    </div>
-</nav>
-
-<div class="container mt-4">
-    <h5>Xin chào, Giảng viên!</h5>
-    <div class="row mt-3">
-        <div class="col-md-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h6 class="card-title">Hồ sơ cá nhân</h6>
-                    <a th:href="@{/profile}" class="btn btn-light btn-sm mt-2">Xem hồ sơ</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-</body>
-
-
-
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Ngày hẹn</th>
+        <th>Giảng viên</th>
+        <th>Thời gian</th>
+        <th>Trạng thái</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="ap : ${appointments}">
+        <td th:text="${ap.appointmentDate}"></td>
+        <td th:text="${ap.lecturer.user.profile.fullName}"></td>
+        <td th:text="${ap.startTime + ' - ' + ap.endTime}"></td>
+    </tr>
+    </tbody>
+</table>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

@@ -62,7 +62,7 @@
                             <select th:field="*{status}" class="form-select">
                                 <option th:each="s : ${statuses}"
                                         th:value="${s}"
-                                        th:text="${s == T(com.btvn.projectfinal.model.entity.Equipment.EquipmentStatus).AVAILABLE ? 'Còn hàng' : 'Ngừng cung cấp'}">
+                                        th:text="${s == T(com.btvn.projectfinal.model.entity.Equipment.EquipmentStatus).AVAILABLE ? 'Còn' : 'Trống'}">
                                 </option>
                             </select>
                         </div>

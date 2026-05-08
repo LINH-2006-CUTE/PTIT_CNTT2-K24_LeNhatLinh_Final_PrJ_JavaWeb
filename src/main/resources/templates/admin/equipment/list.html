@@ -15,8 +15,8 @@
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5>🛠️ Danh sách Thiết bị</h5>
-        <a th:href="@{/admin/equipment/add}" class="btn btn-success">+ Thêm thiết bị</a>
+        <h5>Danh sách Thiết bị</h5>
+        <a th:href="@{/admin/equipment/add}" class="btn btn-success">Thêm thiết bị</a>
     </div>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
@@ -26,14 +26,13 @@
         <input type="text" name="keyword" th:value="${keyword}"
                class="form-control" placeholder="Tìm theo tên thiết bị...">
         <button type="submit" class="btn btn-primary">Tìm</button>
-        <a th:href="@{/admin/equipment}" class="btn btn-secondary">Reset</a>
     </form>
 
 
     <table class="table table-bordered table-hover">
         <thead class="table-dark">
         <tr>
-            <th>#</th>
+            <th></th>
             <th>Tên thiết bị</th>
             <th>Mô tả</th>
             <th>Số lượng</th>
@@ -51,9 +50,9 @@
             <td th:text="${item.unit}"></td>
             <td>
                 <span th:if="${item.status.name() == 'AVAILABLE'}"
-                      class="badge bg-success">Còn hàng</span>
+                      class="badge bg-success">Còn</span>
                 <span th:if="${item.status.name() == 'UNAVAILABLE'}"
-                      class="badge bg-secondary">Ngừng cung cấp</span>
+                      class="badge bg-secondary">Trống</span>
             </td>
             <td>
                 <a th:href="@{/admin/equipment/edit/{id}(id=${item.id})}"
@@ -68,7 +67,7 @@
             </td>
         </tr>
         <tr th:if="${equipmentPage.content.isEmpty()}">
-            <td colspan="7" class="text-center text-muted">Không có thiết bị nào.</td>
+            <td colspan="7" class="text-center text-muted">Không có thiết bị nào</td>
         </tr>
         </tbody>
     </table>
@@ -85,7 +84,7 @@
         </ul>
     </nav>
 
-    <a th:href="@{/admin/dashboard}" class="btn btn-secondary">← Quay lại Dashboard</a>
+    <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Quay lại</a>
 </div>
 
 <!-- Optional JavaScript -->

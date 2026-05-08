@@ -12,6 +12,4 @@ public class StudentController {
     public String dashboard() {
         return "student/dashboard";
     }
-
-
 }

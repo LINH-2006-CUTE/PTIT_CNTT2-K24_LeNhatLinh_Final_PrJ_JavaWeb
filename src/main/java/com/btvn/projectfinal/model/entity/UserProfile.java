@@ -41,17 +41,10 @@ public class UserProfile {
     @Column(length = 10)
     private String gender; // MALE, FEMALE, OTHER
 
-    // Chỉ dùng cho STUDENT
-    @Column(name = "student_id", length = 20)
-    private String studentId; // Mã số sinh viên
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
-    private Department department; // Khoa của sinh viên
-
-    // Chỉ dùng cho LECTURER (hoặc dùng bảng lecturers riêng)
-    @Column(name = "academic_rank", length = 50)
-    private String academicRank; // GS, PGS, TS, ThS
+    private Department department;
 
     @Column(name = "updated_at")
     @UpdateTimestamp

@@ -17,7 +17,7 @@ xmlns:th="http://www.thymeleaf.org">
         <div class="col-md-7">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">👤 Hồ sơ cá nhân</h5>
+                    <h5 class="mb-0">Hồ sơ cá nhân</h5>
                 </div>
                 <div class="card-body">
                     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
@@ -47,7 +47,6 @@ xmlns:th="http://www.thymeleaf.org">
                             </select>
                         </div>
 
-                        <!-- Chỉ hiện cho STUDENT -->
                         <div th:if="${profile.user.role.name() == 'STUDENT'}">
                             <div class="mb-3">
                                 <label class="form-label">Mã số sinh viên</label>
@@ -65,7 +64,7 @@ xmlns:th="http://www.thymeleaf.org">
                             </div>
                         </div>
 
-                        <!-- Chỉ hiện cho LECTURER -->
+                        <!-- LECTURER -->
                         <div th:if="${profile.user.role.name() == 'LECTURER'}">
                             <div class="mb-3">
                                 <label class="form-label">Học hàm/Học vị</label>

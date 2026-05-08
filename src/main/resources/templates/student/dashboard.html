@@ -16,7 +16,7 @@ xmlns:th="http://www.thymeleaf.org"
 
 <div class="container pt-4">
     <nav class="navbar navbar-dark bg-primary px-3">
-        <span class="navbar-brand">🎓 Cổng Sinh viên</span>
+        <span class="navbar-brand">Trang Sinh viên</span>
         <div class="d-flex align-items-center gap-3">
             <span class="text-white" sec:authentication="name"></span>
             <form th:action="@{/auth/logout}" method="post" class="mb-0">
@@ -30,15 +30,35 @@ xmlns:th="http://www.thymeleaf.org"
         <h5>Xin chào, Sinh viên!</h5>
         <div class="row mt-3">
             <div class="col-md-4">
-                <div class="card text-white bg-primary">
+                <div class="card text-white bg-primary shadow">
                     <div class="card-body">
-                        <h6 class="card-title">Hồ sơ cá nhân</h6>
-                        <a th:href="@{/profile}" class="btn btn-light btn-sm mt-2">Xem hồ sơ</a>
+                        <h6 class="card-title"><i class="fas fa-user-circle"></i> Hồ sơ cá nhân</h6>
+                        <p class="small">Cập nhật thông tin sinh viên và khoa ngành.</p>
+                        <a th:href="@{/profile}" class="btn btn-light btn-sm">Xem hồ sơ</a>
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="card text-white bg-success shadow">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="fas fa-calendar-check"></i> Đặt lịch cố vấn</h6>
+                        <p class="small">Chọn giảng viên và khung giờ để nhận tư vấn.</p>
+                        <a th:href="@{/student/appointments/new}" class="btn btn-light btn-sm">Đặt lịch ngay</a>
+                    </div>
+                </div>
+            </div>
+
+<!--            <div class="col-md-4">-->
+<!--                <div class="card text-white bg-info shadow">-->
+<!--                    <div class="card-body">-->
+<!--                        <h6 class="card-title"><i class="fas fa-history"></i> Lịch sử học thuật</h6>-->
+<!--                        <p class="small">Xem lại các buổi tư vấn và kết quả đánh giá.</p>-->
+<!--                        <a th:href="@{/student/history}" class="btn btn-light btn-sm">Xem lịch sử</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
-    </div>
 
 </div>
 

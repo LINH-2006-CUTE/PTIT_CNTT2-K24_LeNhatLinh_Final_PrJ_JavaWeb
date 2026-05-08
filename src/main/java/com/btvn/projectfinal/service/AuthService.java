@@ -57,13 +57,13 @@ public class AuthService implements UserDetailsService {
         profile.setUser(user);
         profile.setFullName(dto.getFullName());
 
-        if (dto.getRole() == User.Role.STUDENT) {
-            profile.setStudentId(dto.getStudentId());
-            if (dto.getDepartmentId() != null) {
-                departmentRepository.findById(dto.getDepartmentId())
-                        .ifPresent(profile::setDepartment);
-            }
-        }
+//        if (dto.getRole() == User.Role.STUDENT) {
+//            profile.setStudentId(dto.getStudentId());
+//            if (dto.getDepartmentId() != null) {
+//                departmentRepository.findById(dto.getDepartmentId())
+//                        .ifPresent(profile::setDepartment);
+//            }
+//        }
 
         profileRepository.save(profile);
     }

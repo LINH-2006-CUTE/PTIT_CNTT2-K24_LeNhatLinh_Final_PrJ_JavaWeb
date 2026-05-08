@@ -31,8 +31,8 @@ public class ProfileController {
         dto.setPhone(profile.getPhone());
         dto.setAddress(profile.getAddress());
         dto.setGender(profile.getGender());
-        dto.setStudentId(profile.getStudentId());
-        dto.setAcademicRank(profile.getAcademicRank());
+//        dto.setStudentId(profile.getStudentId());
+//        dto.setAcademicRank(profile.getAcademicRank());
         if (profile.getDepartment() != null) {
             dto.setDepartmentId(profile.getDepartment().getId());
         }

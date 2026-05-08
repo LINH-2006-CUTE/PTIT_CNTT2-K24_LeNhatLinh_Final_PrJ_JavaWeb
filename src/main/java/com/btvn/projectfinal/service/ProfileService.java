@@ -29,8 +29,6 @@ public class ProfileService {private final UserRepository userRepository;
         profile.setPhone(dto.getPhone());
         profile.setAddress(dto.getAddress());
         profile.setGender(dto.getGender());
-        profile.setStudentId(dto.getStudentId());
-        profile.setAcademicRank(dto.getAcademicRank());
 
         if (dto.getDepartmentId() != null) {
             departmentRepository.findById(dto.getDepartmentId())

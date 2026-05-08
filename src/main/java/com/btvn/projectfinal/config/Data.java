@@ -1,13 +1,7 @@
 package com.btvn.projectfinal.config;
 
-import com.btvn.projectfinal.model.entity.Department;
-import com.btvn.projectfinal.model.entity.LabRoomType;
-import com.btvn.projectfinal.model.entity.User;
-import com.btvn.projectfinal.model.entity.UserProfile;
-import com.btvn.projectfinal.repository.DepartmentRepository;
-import com.btvn.projectfinal.repository.LabRoomTypeRepository;
-import com.btvn.projectfinal.repository.UserProfileRepository;
-import com.btvn.projectfinal.repository.UserRepository;
+import com.btvn.projectfinal.model.entity.*;
+import com.btvn.projectfinal.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -21,13 +15,14 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DataSeeder implements ApplicationRunner {
+public class Data implements ApplicationRunner {
 
     private final DepartmentRepository departmentRepository;
     private final LabRoomTypeRepository labRoomTypeRepository;
     private final UserRepository userRepository;
     private final UserProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LecturerRepository lecturerRepository;
 
     @Override
     @Transactional
@@ -35,15 +30,15 @@ public class DataSeeder implements ApplicationRunner {
         seedDepartments();
         seedLabRoomTypes();
         seedAdminAccount();
+        seedLecturers();
     }
 
     private void seedDepartments() {
         if (departmentRepository.count() > 0) return;
         List<Department> departments = List.of(
                 createDept("Công nghệ Thông tin",   "CNTT"),
-                createDept("Kỹ thuật Phần mềm",    "KTPM"),
+                createDept("Kinh tế & Quản trị",    "KTQT"),
                 createDept("Hệ thống Thông tin",   "HTTT"),
-                createDept("Khoa học Máy tính",    "KHMT"),
                 createDept("An toàn Thông tin",    "ATTT")
         );
         departmentRepository.saveAll(departments);
@@ -55,11 +50,40 @@ public class DataSeeder implements ApplicationRunner {
         List<LabRoomType> types = List.of(
                 createLabType("Phòng Lập trình",          "Máy tính cá nhân, IDE sẵn sàng"),
                 createLabType("Phòng Mạng máy tính",      "Router, Switch, cáp mạng"),
-                createLabType("Phòng Điện tử - Vi xử lý", "Board mạch, oscilloscope"),
                 createLabType("Phòng Đa phương tiện",     "Thiết bị quay phim, dựng phim")
         );
         labRoomTypeRepository.saveAll(types);
         log.info("Seeded {} lab room types", types.size());
+    }
+
+    private void seedLecturers() {
+        if (userRepository.existsByUsername("giangvien01")) {
+            return;
+        }
+        Department cntt = departmentRepository.findByCode("CNTT")
+                .orElseThrow(() -> new RuntimeException("Chưa có khoa CNTT"));
+// tạo user cho gv
+
+        User gv = new User();
+
+        gv.setUsername("giangvien01");
+        gv.setPassword(passwordEncoder.encode("123456"));
+        gv.setRole(User.Role.LECTURER);
+        userRepository.save(gv);
+// tạo profile cho gv
+        UserProfile profile = new UserProfile();
+        profile.setUser(gv);
+        profile.setFullName("Thầy Nguyễn Văn A");
+
+        profileRepository.save(profile);
+
+        Lecturer lecturer = new Lecturer();
+        lecturer.setUser(gv);
+        lecturer.setDepartment(cntt);
+        lecturer.setTitle("Thạc sĩ");
+        lecturer.setSpecialization("Lập trình Java");
+        lecturerRepository.save(lecturer);
+        log.info("Seeded lecturer: Thầy Nguyễn Văn A thuộc khoa CNTT");
     }
 
     private void seedAdminAccount() {

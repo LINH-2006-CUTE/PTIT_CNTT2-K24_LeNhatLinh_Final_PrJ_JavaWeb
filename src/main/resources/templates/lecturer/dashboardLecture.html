@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.w3.org/1999/xhtml">
+xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Admin - Dashboard</title>
+    <title>Lecturer</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,9 +13,8 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-
-<nav class="navbar navbar-dark bg-dark px-3">
-    <span class="navbar-brand">Trang Admin</span>
+<nav class="navbar navbar-dark bg-success px-3">
+    <span class="navbar-brand">Trang Giảng viên</span>
     <div class="d-flex align-items-center gap-3">
         <span class="text-white" sec:authentication="name"></span>
         <form th:action="@{/auth/logout}" method="post" class="mb-0">
@@ -26,38 +25,22 @@
 </nav>
 
 <div class="container mt-4">
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-
-    <h5>Xin chào, Admin!</h5>
-
+    <h5>Xin chào, Giảng viên!</h5>
     <div class="row mt-3">
-        <!--        Trang quản lý hồ sơ sinh viên và giảng viên-->
         <div class="col-md-4">
             <div class="card text-white bg-success">
                 <div class="card-body">
-                    <h6 class="card-title">Quản lý hồ sơ cá nhân</h6>
-                    <div>
-                        <a th:href="@{/profile}" class="btn btn-light btn-sm mt-2">Sinh viên</a>
-                        <a th:href="@{/pro}" class="btn btn-dark btn-sm mt-2">Giảng viên</a>
-<!--                        <a th:href="@{/admin/list-profile(type='student')}" class="btn btn-light btn-sm mt-2">Sinh viên</a>-->
-<!--                        <a th:href="@{/admin/list-profile(type='lecturer')}" class="btn btn-dark btn-sm mt-2">Giảng viên</a>-->
-                    </div>
-                </div>
-            </div>
-
-            <!--            Trang quản lý thiết bị-->
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h6 class="card-title">Quản lý Thiết bị</h6>
-                    <a th:href="@{/admin/equipment}" class="btn btn-light btn-sm mt-2">Trang quản lý thiết bị</a>
+                    <h6 class="card-title">Hồ sơ cá nhân</h6>
+                    <a th:href="@{/profile}" class="btn btn-light btn-sm mt-2">Xem hồ sơ</a>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
+
+</body>
+
+
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

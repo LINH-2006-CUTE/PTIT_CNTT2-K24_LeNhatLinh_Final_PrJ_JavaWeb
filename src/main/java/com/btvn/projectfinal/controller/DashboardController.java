@@ -20,7 +20,7 @@ public class DashboardController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_LECTURER"));
 
         if (isAdmin) return "redirect:/admin/dashboard";
-        if (isLecturer) return "redirect:/lecturer/dashboard";
+        if (isLecturer) return "redirect:/lecturer/dashboardLecture";
         return "redirect:/student/dashboard";
     }
 }
