@@ -17,7 +17,7 @@ public class LectureController {
     private final LectureService lectureService;
 
     @GetMapping("/lecturers")
-    public List<LecturerDTO> getLecturers(@RequestParam Integer deptId) {
+    public List<LecturerDTO> getLecturers(@RequestParam Long deptId) {
         return lectureService.getLecturersByDept(deptId);
     }
 }

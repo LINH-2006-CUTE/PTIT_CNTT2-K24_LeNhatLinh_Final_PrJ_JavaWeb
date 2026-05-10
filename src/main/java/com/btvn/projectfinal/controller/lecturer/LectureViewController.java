@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/lecture")
+@RequestMapping("/lecturer")
 public class LectureViewController {
-    @GetMapping("/dashboardEcture")
-    public String dashboardEcture() {
+    @GetMapping("/dashboardLecture")
+    public String dashboardLecture() {
         return "lecturer/dashboardLecture";
     }
 }

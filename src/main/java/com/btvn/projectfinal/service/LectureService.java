@@ -14,7 +14,7 @@ public class LectureService {
 
     private final LecturerRepository lecturerRepository;
 
-    public List<LecturerDTO> getLecturersByDept(Integer deptId) {
+    public List<LecturerDTO> getLecturersByDept(Long deptId) {
         return lecturerRepository.findByDepartmentId(deptId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

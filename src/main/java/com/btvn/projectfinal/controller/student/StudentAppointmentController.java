@@ -1,12 +1,13 @@
 package com.btvn.projectfinal.controller.student;
 
 import com.btvn.projectfinal.model.entity.Appointment;
-import com.btvn.projectfinal.model.entity.User;
 import com.btvn.projectfinal.model.entity.Lecturer;
+import com.btvn.projectfinal.model.entity.User;
 import com.btvn.projectfinal.repository.AppointmentRepository;
 import com.btvn.projectfinal.repository.DepartmentRepository;
 import com.btvn.projectfinal.repository.LecturerRepository;
 import com.btvn.projectfinal.repository.UserRepository;
+import com.btvn.projectfinal.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,9 +31,11 @@ public class StudentAppointmentController {
     private final DepartmentRepository departmentRepository;
     private final LecturerRepository lecturerRepository;
     private final AppointmentRepository appointmentRepository;
+    private final AppointmentService appointmentService;
+
     @GetMapping("/new")
     public String showBookingPage(
-            @RequestParam(required = false) Integer departmentId,
+            @RequestParam(required = false) Long departmentId,
             Model model,
             Principal principal) {
         User student = userRepository.findByUsername(principal.getName())
@@ -54,6 +57,7 @@ public class StudentAppointmentController {
 
     @PostMapping("/save")
     public String saveAppointment(
+            @RequestParam Long departmentId,
             @RequestParam Long lecturerId,
             @RequestParam String appointmentDate,
             @RequestParam String startTime,
@@ -62,30 +66,33 @@ public class StudentAppointmentController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            User student = userRepository.findByUsername(principal.getName()).get();
-            // tim gv theo id
-            Lecturer lecturer = lecturerRepository.findById(lecturerId).get();
+            User student = userRepository.findByUsername(principal.getName())
+                    .orElseThrow(() -> new IllegalStateException("Không tìm thấy sinh viên"));
 
-            Appointment app = new Appointment();
-            app.setStudent(student);
-            app.setLecturer(lecturer);
-            app.setAppointmentDate(LocalDate.parse(appointmentDate));
-            app.setStartTime(LocalTime.parse(startTime));
-            app.setEndTime(LocalTime.parse(endTime));
+            appointmentService.bookSession(
+                    student.getId(),
+                    lecturerId,
+                    departmentId,
+                    LocalDate.parse(appointmentDate),
+                    LocalTime.parse(startTime),
+                    LocalTime.parse(endTime));
 
-            appointmentRepository.save(app);
             redirectAttributes.addFlashAttribute("message", "Đặt lịch thành công!");
             return "redirect:/student/appointments/my-appointments";
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
-            return "redirect:/student/appointments/new";
+            String redirect = departmentId != null
+                    ? "redirect:/student/appointments/new?departmentId=" + departmentId
+                    : "redirect:/student/appointments/new";
+            return redirect;
         }
     }
     @GetMapping("/my-appointments")
     public String listAppointments(Model model, Principal principal) {
         User student = userRepository.findByUsername(principal.getName()).get();
-        List<Appointment> list = appointmentRepository.findByStudentId(student.getId());
+        List<Appointment> list =
+                appointmentRepository.findByStudentIdOrderByAppointmentDateDescStartTimeDesc(student.getId());
         model.addAttribute("appointments", list);
 
         return "student/list-appointments";

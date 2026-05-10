@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "appointments")
+@Table(name = "mentoring_sessions")
 @Getter
 @Setter
 @NoArgsConstructor

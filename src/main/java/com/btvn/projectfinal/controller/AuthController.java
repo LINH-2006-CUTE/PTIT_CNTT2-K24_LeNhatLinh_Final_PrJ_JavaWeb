@@ -6,7 +6,6 @@ import com.btvn.projectfinal.model.entity.User;
 import com.btvn.projectfinal.repository.DepartmentRepository;
 import com.btvn.projectfinal.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +47,7 @@ public class AuthController {
             @Valid @ModelAttribute("loginDTO") LoginDTO dto,
             BindingResult bindingResult,
             Model model,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             return "auth/login";
@@ -76,6 +74,10 @@ public class AuthController {
             return "auth/login";
         } catch (DisabledException e) {
             model.addAttribute("errorMessage", "Tài khoản của bạn đã bị khóa!");
+            model.addAttribute("loginDTO", dto);
+            return "auth/login";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Đăng nhập thất bại. Vui lòng thử lại.");
             model.addAttribute("loginDTO", dto);
             return "auth/login";
         }
