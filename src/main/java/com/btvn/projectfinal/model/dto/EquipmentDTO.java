@@ -22,9 +22,15 @@ public class EquipmentDTO {
     @Min(value = 0, message = "Số lượng không được âm")
     private Integer quantity;
 
-    @NotBlank(message = "Đơn vị tính không được để trống")
-    @Size(max = 50)
+    /** Để trống → hệ thống dùng "cái". */
+    @Size(max = 50, message = "Đơn vị không quá 50 ký tự")
     private String unit;
 
     private Equipment.EquipmentStatus status;
+
+    /** Gán khoa (chọn từ dữ liệu nền — chỉ đọc danh sách). */
+    private Long departmentId;
+
+    /** Gán loại phòng lab (dữ liệu nền). */
+    private Long labRoomTypeId;
 }

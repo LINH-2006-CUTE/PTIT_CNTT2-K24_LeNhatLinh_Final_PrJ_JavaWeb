@@ -27,11 +27,11 @@ public class LecturerConsultationService {
     private final BorrowingDetailRepository borrowingDetailRepository;
     private final EquipmentRepository equipmentRepository;
 
-    /** Danh sách chờ: Pending, thời gian sớm nhất trước. */
+    /** Danh sách chờ: Pending (và bản ghi cũ tiếng Việt nếu có), thời gian sớm nhất trước. */
     @Transactional(readOnly = true)
     public List<Appointment> listPendingSessions(Long lecturerId) {
-        return bookingRepository.findByLecturer_IdAndStatusOrderByAppointmentDateAscStartTimeAsc(
-                lecturerId, MentoringSessionStatus.PENDING);
+        return bookingRepository.findPendingSessionsForLecturer(
+                lecturerId, MentoringSessionStatus.statusesAwaitingLecturer());
     }
 
     /** Lịch sử đã hoàn thành + phân trang. */
@@ -54,8 +54,8 @@ public class LecturerConsultationService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Không tìm thấy buổi tư vấn hoặc buổi này không thuộc về bạn."));
 
-        if (!MentoringSessionStatus.PENDING.equals(session.getStatus())) {
-            throw new IllegalStateException("Buổi tư vấn không ở trạng thái Pending (đã xử lý hoặc đã hủy).");
+        if (!MentoringSessionStatus.isAwaitingLecturerEvaluation(session.getStatus())) {
+            throw new IllegalStateException("Buổi tư vấn không còn ở trạng thái chờ xử lý (đã đánh giá, đã hủy hoặc đã hoàn thành).");
         }
 
         if (academicEvaluationRepository.existsByMentoringSession_Id(session.getId())) {
@@ -84,7 +84,7 @@ public class LecturerConsultationService {
         BorrowingRecord record = new BorrowingRecord();
         record.setStudent(session.getStudent());
         record.setMentoringSession(session);
-        record.setStatus(BorrowingRecordStatus.WAITING_APPROVAL);
+        record.setStatus(BorrowingRecordStatus.CHO_CAP_PHAT);
         borrowingRecordRepository.save(record);
 
         for (Equipment equipment : equipments) {

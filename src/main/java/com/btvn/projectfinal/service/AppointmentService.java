@@ -69,7 +69,11 @@ public class AppointmentService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sinh viên."));
 
         if (bookingRepository.countActiveBookingAtSameSlot(
-                lecturerId, appointmentDate, startTime, endTime) > 0) {
+                lecturerId,
+                appointmentDate,
+                startTime,
+                endTime,
+                MentoringSessionStatus.statusesBlockingSlot()) > 0) {
             throw new IllegalStateException("Giảng viên đã có lịch");
         }
 
@@ -95,6 +99,10 @@ public class AppointmentService {
 
         if (MentoringSessionStatus.CANCELLED.equals(appointment.getStatus())) {
             throw new IllegalStateException("Lịch này đã được hủy trước đó.");
+        }
+
+        if (MentoringSessionStatus.COMPLETED.equals(appointment.getStatus())) {
+            throw new IllegalStateException("Buổi đã hoàn thành, không thể hủy.");
         }
 
         LocalDateTime appointmentStart = LocalDateTime.of(

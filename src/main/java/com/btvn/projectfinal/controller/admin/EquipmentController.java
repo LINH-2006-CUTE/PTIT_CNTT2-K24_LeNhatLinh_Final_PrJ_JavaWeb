@@ -2,6 +2,8 @@ package com.btvn.projectfinal.controller.admin;
 
 import com.btvn.projectfinal.model.dto.EquipmentDTO;
 import com.btvn.projectfinal.model.entity.Equipment;
+import com.btvn.projectfinal.repository.DepartmentRepository;
+import com.btvn.projectfinal.repository.LabRoomTypeRepository;
 import com.btvn.projectfinal.service.EquipmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class EquipmentController {
     private final EquipmentService equipmentService;
+    private final DepartmentRepository departmentRepository;
+    private final LabRoomTypeRepository labRoomTypeRepository;
 
     @GetMapping
     public String list(
@@ -42,14 +46,15 @@ public class EquipmentController {
     public String addForm(Model model) {
         model.addAttribute("equipmentDTO", new EquipmentDTO());
         model.addAttribute("statuses", Equipment.EquipmentStatus.values());
+        model.addAttribute("departments", departmentRepository.findAll());
+        model.addAttribute("labRoomTypes", labRoomTypeRepository.findAll());
         return "admin/equipment/form";
     }
 
     // edit
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
-        Equipment equipment = equipmentService.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy thiết bị!"));
+        Equipment equipment = equipmentService.getEditableEquipment(id);
 
         EquipmentDTO dto = new EquipmentDTO();
         dto.setId(equipment.getId());
@@ -58,9 +63,17 @@ public class EquipmentController {
         dto.setQuantity(equipment.getQuantity());
         dto.setUnit(equipment.getUnit());
         dto.setStatus(equipment.getStatus());
+        if (equipment.getDepartment() != null) {
+            dto.setDepartmentId(equipment.getDepartment().getId());
+        }
+        if (equipment.getLabRoomType() != null) {
+            dto.setLabRoomTypeId(equipment.getLabRoomType().getId());
+        }
 
         model.addAttribute("equipmentDTO", dto);
         model.addAttribute("statuses", Equipment.EquipmentStatus.values());
+        model.addAttribute("departments", departmentRepository.findAll());
+        model.addAttribute("labRoomTypes", labRoomTypeRepository.findAll());
         return "admin/equipment/form";
     }
 
@@ -73,15 +86,24 @@ public class EquipmentController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("statuses", Equipment.EquipmentStatus.values());
+            model.addAttribute("departments", departmentRepository.findAll());
+            model.addAttribute("labRoomTypes", labRoomTypeRepository.findAll());
             return "admin/equipment/form";
         }
 
-        if (dto.getId() != null) {
-            equipmentService.update(dto.getId(), dto);
-            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thiết bị thành công!");
-        } else {
-            equipmentService.save(dto);
-            redirectAttributes.addFlashAttribute("successMessage", "Thêm thiết bị thành công!");
+        try {
+            if (dto.getId() != null) {
+                equipmentService.update(dto.getId(), dto);
+                redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thiết bị thành công!");
+            } else {
+                equipmentService.save(dto);
+                redirectAttributes.addFlashAttribute("successMessage", "Thêm thiết bị thành công!");
+            }
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return dto.getId() != null
+                    ? "redirect:/admin/equipment/edit/" + dto.getId()
+                    : "redirect:/admin/equipment/add";
         }
 
         return "redirect:/admin/equipment";
@@ -90,8 +112,14 @@ public class EquipmentController {
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        equipmentService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Xóa thiết bị thành công!");
+        try {
+            equipmentService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa thiết bị thành công!");
+        } catch (IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (NoSuchElementException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/admin/equipment";
     }
 }

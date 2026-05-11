@@ -6,6 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "borrowing_records")
@@ -28,9 +30,12 @@ public class BorrowingRecord {
     private Appointment mentoringSession;
 
     @Column(nullable = false, length = 40)
-    private String status = BorrowingRecordStatus.WAITING_APPROVAL;
+    private String status = BorrowingRecordStatus.CHO_CAP_PHAT;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "borrowingRecord", fetch = FetchType.LAZY)
+    private List<BorrowingDetail> details = new ArrayList<>();
 }

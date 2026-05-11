@@ -1,11 +1,13 @@
 package com.btvn.projectfinal.config;
 
+import com.btvn.projectfinal.model.MentoringSessionStatus;
 import com.btvn.projectfinal.model.entity.*;
 import com.btvn.projectfinal.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ public class Data implements ApplicationRunner {
     private final UserProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final LecturerRepository lecturerRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
@@ -32,6 +35,28 @@ public class Data implements ApplicationRunner {
         seedAdminAccount();
         seedLecturers();
         linkOrphanLecturerRoleUsers();
+        normalizeLegacyMentoringStatuses();
+    }
+
+    /**
+     * Bản ghi đặt lịch cũ dùng tiếng Việt — trang GV chỉ tìm {@code Pending} nên sẽ trống nếu không đồng bộ.
+     */
+    private void normalizeLegacyMentoringStatuses() {
+        try {
+            int n = jdbcTemplate.update(
+                    "UPDATE mentoring_sessions SET status = ? WHERE status IN (?, ?)",
+                    MentoringSessionStatus.PENDING,
+                    MentoringSessionStatus.LEGACY_CHO_XAC_NHAN,
+                    MentoringSessionStatus.LEGACY_DA_XAC_NHAN);
+            int n2 = jdbcTemplate.update(
+                    "UPDATE mentoring_sessions SET status = ? WHERE status IS NULL OR TRIM(status) = ''",
+                    MentoringSessionStatus.PENDING);
+            if (n + n2 > 0) {
+                log.info("Chuẩn hoá trạng thái buổi tư vấn: {} dòng cập nhật sang Pending.", n + n2);
+            }
+        } catch (Exception ex) {
+            log.warn("Không chuẩn hoá mentoring_sessions (bỏ qua nếu bảng chưa tồn tại): {}", ex.getMessage());
+        }
     }
 
     /**
@@ -92,9 +117,7 @@ public class Data implements ApplicationRunner {
         Department cntt = departmentRepository.findByCode("CNTT")
                 .orElseThrow(() -> new RuntimeException("Chưa có khoa CNTT"));
 // tạo user cho gv
-
         User gv = new User();
-
         gv.setUsername("giangvien01");
         gv.setPassword(passwordEncoder.encode("123456"));
         gv.setRole(User.Role.LECTURER);

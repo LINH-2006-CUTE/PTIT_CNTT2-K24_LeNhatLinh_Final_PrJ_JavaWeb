@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface AcademicEvaluationRepository extends JpaRepository<AcademicEvaluation, Long> {
 
     boolean existsByMentoringSession_Id(Integer mentoringSessionId);
+
+    void deleteByMentoringSession_Id(Integer mentoringSessionId);
 }

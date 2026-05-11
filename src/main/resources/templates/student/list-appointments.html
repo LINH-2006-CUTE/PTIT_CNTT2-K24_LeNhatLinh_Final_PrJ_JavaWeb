@@ -30,20 +30,23 @@
                 </thead>
                 <tbody>
                 <tr th:each="ap : ${appointments}"
-                    th:with="startAt=${T(java.time.LocalDateTime).of(ap.appointmentDate, ap.startTime)}">
+                    th:with="startAt=${T(java.time.LocalDateTime).of(ap.appointmentDate, ap.startTime)},
+                             awaiting=${ap.status == 'Pending' or ap.status == 'Chờ xác nhận' or ap.status == 'Đã xác nhận'}">
                     <td th:text="${ap.appointmentDate}"></td>
                     <td th:text="${ap.lecturer.user.profile != null ? ap.lecturer.user.profile.fullName : 'Chưa cập nhật'}"></td>
                     <td th:text="${ap.startTime + ' - ' + ap.endTime}"></td>
                     <td>
                         <th:block th:switch="${ap.status}">
                             <span th:case="'Pending'">Chờ hoàn thành</span>
+                            <span th:case="'Chờ xác nhận'">Chờ hoàn thành</span>
+                            <span th:case="'Đã xác nhận'">Chờ hoàn thành</span>
                             <span th:case="'Completed'">Đã hoàn thành</span>
                             <span th:case="'Cancelled'">Đã hủy</span>
                             <span th:case="*" th:text="${ap.status}">—</span>
                         </th:block>
                     </td>
                     <td class="text-end">
-                        <form th:if="${ap.status == 'Pending' and !startAt.isBefore(now.plusHours(24))}"
+                        <form th:if="${awaiting and !startAt.isBefore(now.plusHours(24))}"
                               th:action="@{/student/appointments/{id}/cancel(id=${ap.id})}"
                               method="post"
                               class="d-inline">
@@ -53,7 +56,7 @@
                                 Hủy lịch
                             </button>
                         </form>
-                        <span th:if="${ap.status == 'Pending' and startAt.isBefore(now.plusHours(24))}"
+                        <span th:if="${awaiting and startAt.isBefore(now.plusHours(24))}"
                               class="text-secondary small">
                             Không thể hủy (sát giờ hẹn)
                         </span>

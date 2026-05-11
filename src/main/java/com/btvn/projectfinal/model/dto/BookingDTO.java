@@ -7,9 +7,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * Dữ liệu form đặt lịch: Khoa → Giảng viên → Ngày → Khung giờ (bắt đầu / kết thúc).
- */
 @Data
 public class BookingDTO {
 

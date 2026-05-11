@@ -5,6 +5,7 @@ import com.btvn.projectfinal.model.dto.ConsultationHistoryProjection;
 import com.btvn.projectfinal.model.entity.Appointment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,11 +21,28 @@ public interface BookingRepository extends JpaRepository<Appointment, Integer> {
 
     List<Appointment> findByStudent_IdOrderByAppointmentDateDescStartTimeDesc(Long studentId);
 
+    /**
+     * Id các buổi tư vấn của giảng viên (JPQL rõ ràng — tránh derived query {@code findByLecturer_Id} không khớp).
+     */
+    @Query("SELECT a.id FROM Appointment a WHERE a.lecturer.id = :lecturerId")
+    List<Integer> findSessionIdsByLecturerId(@Param("lecturerId") Long lecturerId);
+
     Optional<Appointment> findByIdAndStudent_Id(Integer id, Long studentId);
 
     Optional<Appointment> findByIdAndLecturer_Id(Integer id, Long lecturerId);
 
-    List<Appointment> findByLecturer_IdAndStatusOrderByAppointmentDateAscStartTimeAsc(Long lecturerId, String status);
+    /**
+     * Ca chờ giảng viên xử lý (Pending + trạng thái cũ tiếng Việt nếu DB chưa migrate).
+     */
+    @EntityGraph(attributePaths = {"student", "student.profile"})
+    @Query("""
+            SELECT a FROM Appointment a
+            WHERE a.lecturer.id = :lecturerId AND a.status IN :statuses
+            ORDER BY a.appointmentDate ASC, a.startTime ASC
+            """)
+    List<Appointment> findPendingSessionsForLecturer(
+            @Param("lecturerId") Long lecturerId,
+            @Param("statuses") List<String> statuses);
 
     /**
      * Lịch sử các ca đã hoàn thành của một giảng viên (có đánh giá).
@@ -65,13 +83,14 @@ public interface BookingRepository extends JpaRepository<Appointment, Integer> {
               AND a.appointmentDate = :appointmentDate
               AND a.startTime = :startTime
               AND a.endTime = :endTime
-              AND a.status = 'Pending'
+              AND a.status IN :activeStatuses
             """)
     long countActiveBookingAtSameSlot(
             @Param("lecturerId") Long lecturerId,
             @Param("appointmentDate") LocalDate appointmentDate,
             @Param("startTime") LocalTime startTime,
-            @Param("endTime") LocalTime endTime);
+            @Param("endTime") LocalTime endTime,
+            @Param("activeStatuses") List<String> activeStatuses);
 
     /**
      * Tra cứu lịch sử tư vấn của một sinh viên (JOIN + GROUP_CONCAT trong DB, không gộp dữ liệu bằng vòng lặp Java).

@@ -13,12 +13,13 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h4 class="mb-4" th:text="${equipmentDTO.id != null} ? 'Cập nhật thiết bị' : 'Thêm thiết bị mới'"></h4>
+                    <p class="small text-secondary">Khoa và loại phòng: chọn từ <a th:href="@{/admin/reference}" target="_blank">dữ liệu nền (chỉ xem)</a>.</p>
                     <form th:action="@{/admin/equipment/save}" th:object="${equipmentDTO}" method="post" class="row g-3">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <input type="hidden" th:field="*{id}">
 
                         <div class="col-12">
-                            <label class="form-label">Tên thiết bị</label>
+                            <label class="form-label">Tên thiết bị <span class="text-danger">*</span></label>
                             <input type="text" th:field="*{name}" class="form-control" th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'">
                             <div class="invalid-feedback" th:errors="*{name}"></div>
                         </div>
@@ -27,20 +28,34 @@
                             <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Số lượng</label>
+                            <label class="form-label">Khoa phù hợp</label>
+                            <select th:field="*{departmentId}" class="form-select">
+                                <option value="">— Không gán —</option>
+                                <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name + ' (' + d.code + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Loại phòng lab</label>
+                            <select th:field="*{labRoomTypeId}" class="form-select">
+                                <option value="">— Không gán —</option>
+                                <option th:each="t : ${labRoomTypes}" th:value="${t.id}" th:text="${t.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
                             <input type="number" min="0" th:field="*{quantity}" class="form-control" th:classappend="${#fields.hasErrors('quantity')} ? ' is-invalid'">
                             <div class="invalid-feedback" th:errors="*{quantity}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Đơn vị</label>
-                            <input type="text" th:field="*{unit}" class="form-control" th:classappend="${#fields.hasErrors('unit')} ? ' is-invalid'">
+                            <input type="text" th:field="*{unit}" class="form-control" placeholder="Để trống = cái">
                             <div class="invalid-feedback" th:errors="*{unit}"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Trạng thái</label>
                             <select th:field="*{status}" class="form-select">
                                 <option th:each="s : ${statuses}" th:value="${s}"
-                                        th:text="${s == T(com.btvn.projectfinal.model.entity.Equipment.EquipmentStatus).AVAILABLE ? 'Còn' : 'Trống'}"></option>
+                                        th:text="${s == T(com.btvn.projectfinal.model.entity.Equipment.EquipmentStatus).AVAILABLE ? 'Khả dụng' : 'Ngưng / không dùng'}"></option>
                             </select>
                         </div>
                         <div class="col-12 d-flex gap-2 justify-content-end">

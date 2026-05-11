@@ -9,11 +9,15 @@
 <body class="bg-light">
 <div class="container py-4">
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Danh sách thiết bị</h4>
-        <a th:href="@{/admin/equipment/add}" class="btn btn-success">Thêm thiết bị</a>
+        <h4 class="mb-0">Danh sách thiết bị (CORE-04)</h4>
+        <div class="d-flex flex-wrap gap-2">
+            <a th:href="@{/admin/reference}" class="btn btn-outline-secondary btn-sm">Xem khoa &amp; loại phòng</a>
+            <a th:href="@{/admin/equipment/add}" class="btn btn-success">Thêm thiết bị</a>
+        </div>
     </div>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
     <form th:action="@{/admin/equipment}" method="get" class="row g-2 mb-3">
         <div class="col-md-8">
@@ -29,13 +33,14 @@
 
     <div class="card border-0 shadow-sm">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 small">
                 <thead class="table-light">
                 <tr>
                     <th>#</th>
                     <th>Tên</th>
-                    <th>Mô tả</th>
-                    <th>Số lượng</th>
+                    <th>Khoa</th>
+                    <th>Loại phòng</th>
+                    <th>Tồn kho</th>
                     <th>Đơn vị</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
@@ -43,16 +48,17 @@
                 </thead>
                 <tbody>
                 <tr th:each="item, stat : ${equipmentPage.content}">
-                    <td th:text="${stat.index + 1}"></td>
+                    <td th:text="${stat.index + 1 + equipmentPage.number * equipmentPage.size}"></td>
                     <td th:text="${item.name}"></td>
-                    <td th:text="${item.description}"></td>
+                    <td th:text="${item.department != null ? item.department.name : '—'}"></td>
+                    <td th:text="${item.labRoomType != null ? item.labRoomType.name : '—'}"></td>
                     <td th:text="${item.quantity}"></td>
                     <td th:text="${item.unit}"></td>
                     <td>
-                        <span class="badge text-bg-success" th:if="${item.status.name() == 'AVAILABLE'}">Còn</span>
-                        <span class="badge text-bg-secondary" th:if="${item.status.name() == 'UNAVAILABLE'}">Trống</span>
+                        <span class="badge text-bg-success" th:if="${item.status.name() == 'AVAILABLE'}">Khả dụng</span>
+                        <span class="badge text-bg-secondary" th:if="${item.status.name() == 'UNAVAILABLE'}">Ngưng</span>
                     </td>
-                    <td class="d-flex gap-1">
+                    <td class="d-flex flex-wrap gap-1">
                         <a th:href="@{/admin/equipment/edit/{id}(id=${item.id})}" class="btn btn-sm btn-warning">Sửa</a>
                         <form th:action="@{/admin/equipment/delete/{id}(id=${item.id})}" method="post" onsubmit="return confirm('Xác nhận xóa thiết bị này?')">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
@@ -60,8 +66,8 @@
                         </form>
                     </td>
                 </tr>
-                <tr th:if="${equipmentPage.content.isEmpty()}">
-                    <td colspan="7" class="text-center text-secondary py-4">Không có thiết bị.</td>
+                <tr th:if="${equipmentPage.isEmpty()}">
+                    <td colspan="8" class="text-center text-secondary py-4">Không có thiết bị.</td>
                 </tr>
                 </tbody>
             </table>

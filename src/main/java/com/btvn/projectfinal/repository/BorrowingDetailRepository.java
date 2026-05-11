@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BorrowingDetailRepository extends JpaRepository<BorrowingDetail, Long> {
+
+    boolean existsByEquipment_Id(Long equipmentId);
+
+    void deleteByBorrowingRecord_Id(Long borrowingRecordId);
 }

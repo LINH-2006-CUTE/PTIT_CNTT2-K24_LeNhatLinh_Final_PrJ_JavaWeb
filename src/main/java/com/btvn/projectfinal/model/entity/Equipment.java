@@ -22,7 +22,7 @@ public class Equipment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, unique = true, length = 150)
     private String name;
 
     @Column(length = 500)
@@ -37,6 +37,16 @@ public class Equipment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EquipmentStatus status = EquipmentStatus.AVAILABLE;
+
+    /** Khoa/ngành phù hợp (dữ liệu nền — chỉ chọn, không CRUD trên UI Admin). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    /** Loại phòng lab phù hợp (dữ liệu nền — chỉ chọn). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lab_room_type_id")
+    private LabRoomType labRoomType;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp

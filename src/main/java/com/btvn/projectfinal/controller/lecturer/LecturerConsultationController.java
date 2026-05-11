@@ -92,7 +92,7 @@ public class LecturerConsultationController {
         }
 
         return bookingRepository.findByIdAndLecturer_Id(sessionId, lecturer.get().getId())
-                .filter(s -> MentoringSessionStatus.PENDING.equals(s.getStatus()))
+                .filter(s -> MentoringSessionStatus.isAwaitingLecturerEvaluation(s.getStatus()))
                 .map(session -> {
                     EvaluationRequestDTO dto = new EvaluationRequestDTO();
                     dto.setSessionId(sessionId);
