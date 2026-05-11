@@ -1,5 +1,6 @@
 package com.btvn.projectfinal.model.entity;
 
+import com.btvn.projectfinal.model.MentoringSessionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -33,4 +34,10 @@ public class Appointment {
 
     @Column(nullable = false)
     private LocalTime endTime;
+
+    /**
+     * {@link MentoringSessionStatus#PENDING}, {@link MentoringSessionStatus#COMPLETED}, {@link MentoringSessionStatus#CANCELLED}.
+     */
+    @Column(nullable = false, length = 50)
+    private String status = MentoringSessionStatus.PENDING;
 }

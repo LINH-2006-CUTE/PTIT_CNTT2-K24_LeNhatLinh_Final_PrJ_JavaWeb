@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Vai trò</label>
-                            <select th:field="*{role}" class="form-select" th:classappend="${#fields.hasErrors('role')} ? ' is-invalid'" onchange="toggleStudentFields(this.value)">
+                            <select th:field="*{role}" class="form-select" th:classappend="${#fields.hasErrors('role')} ? ' is-invalid'" onchange="toggleRoleDepartmentFields(this.value)">
                                 <option value="">-- Chọn vai trò --</option>
                                 <option th:each="role : ${roles}" th:value="${role}"
                                         th:text="${role == T(com.btvn.projectfinal.model.entity.User.Role).STUDENT ? 'Sinh viên' : 'Giảng viên'}"></option>
@@ -50,10 +50,11 @@
                             <div class="invalid-feedback" th:errors="*{confirmPassword}"></div>
                         </div>
 
-                        <div class="col-12" id="studentFields" style="display:none;">
+                        <div class="col-12" id="roleDepartmentFields" style="display:none;">
                             <label class="form-label">Khoa/Ngành</label>
+                            <p class="small text-secondary mb-1">Sinh viên: nên chọn khoa. Giảng viên: chọn khoa giảng dạy (nếu bỏ trống hệ thống dùng khoa mặc định).</p>
                             <select th:field="*{departmentId}" class="form-select">
-                                <option value="">-- Chọn Khoa/Ngành --</option>
+                                <option value="">-- Chọn Khoa/Ngành (tuỳ chọn với GV) --</option>
                                 <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
                             </select>
                         </div>
@@ -70,13 +71,13 @@
     </div>
 </div>
 <script>
-    function toggleStudentFields(role) {
-        const fields = document.getElementById('studentFields');
-        fields.style.display = role === 'STUDENT' ? 'block' : 'none';
+    function toggleRoleDepartmentFields(role) {
+        const fields = document.getElementById('roleDepartmentFields');
+        fields.style.display = (role === 'STUDENT' || role === 'LECTURER') ? 'block' : 'none';
     }
     window.onload = function () {
         const roleSelect = document.querySelector('select[name="role"]');
-        if (roleSelect) toggleStudentFields(roleSelect.value);
+        if (roleSelect) toggleRoleDepartmentFields(roleSelect.value);
     };
 </script>
 </body>

@@ -21,12 +21,36 @@
 </nav>
 
 <div class="container py-4">
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
     <h4 class="mb-4">Xin chào giảng viên</h4>
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">Hồ sơ cá nhân</h5>
-            <p class="text-secondary">Cập nhật thông tin cá nhân và chuyên môn giảng dạy.</p>
-            <a th:href="@{/profile}" class="btn btn-success">Xem hồ sơ</a>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Ca tư vấn chờ xử lý</h5>
+                    <p class="card-text text-secondary">Các buổi trạng thái Pending — sắp xếp theo thời gian sớm nhất trước.</p>
+                    <a th:href="@{/lecturer/consultations/pending}" class="btn btn-success">Mở danh sách chờ</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Lịch sử tư vấn</h5>
+                    <p class="card-text text-secondary">Xem các ca đã hoàn thành, sinh viên và nội dung đánh giá (có phân trang).</p>
+                    <a th:href="@{/lecturer/consultations/history}" class="btn btn-outline-success">Xem lịch sử</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Hồ sơ cá nhân</h5>
+                    <p class="card-text text-secondary">Cập nhật thông tin cá nhân và chuyên môn giảng dạy.</p>
+                    <a th:href="@{/profile}" class="btn btn-primary">Xem hồ sơ</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

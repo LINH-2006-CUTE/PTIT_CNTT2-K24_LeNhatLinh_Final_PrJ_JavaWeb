@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface LecturerRepository extends JpaRepository<Lecturer, Long> {
     List<Lecturer> findByDepartmentId(Long departmentId);
 
+    Optional<Lecturer> findByUser_Id(Long userId);
+
     /**
      * Khóa theo giảng viên để tránh hai request đặt lịch cùng lúc ghi trùng khung giờ (MySQL InnoDB row lock).
      */

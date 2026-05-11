@@ -31,6 +31,35 @@ public class Data implements ApplicationRunner {
         seedLabRoomTypes();
         seedAdminAccount();
         seedLecturers();
+        linkOrphanLecturerRoleUsers();
+    }
+
+    /**
+     * Tài khoản có role LECTURER nhưng chưa có dòng {@code lecturers} (đăng ký cũ / nhập tay DB)
+     * → tạo bản ghi để tránh lỗi khi vào chức năng giảng viên.
+     */
+    private void linkOrphanLecturerRoleUsers() {
+        Department defaultDept = departmentRepository.findByCode("CNTT")
+                .orElseGet(() -> departmentRepository.findAll().stream().findFirst().orElse(null));
+        if (defaultDept == null) {
+            log.warn("Không thể gắn hồ sơ giảng viên: chưa có khoa nào trong DB.");
+            return;
+        }
+        for (User u : userRepository.findAll()) {
+            if (u.getRole() != User.Role.LECTURER) {
+                continue;
+            }
+            if (lecturerRepository.findByUser_Id(u.getId()).isPresent()) {
+                continue;
+            }
+            Lecturer lecturer = new Lecturer();
+            lecturer.setUser(u);
+            lecturer.setDepartment(defaultDept);
+            lecturer.setTitle("Giảng viên");
+            lecturer.setSpecialization("Chưa cập nhật (tự động gắn khi khởi động)");
+            lecturerRepository.save(lecturer);
+            log.info("Đã tự động tạo hồ sơ lecturers cho tài khoản: {}", u.getUsername());
+        }
     }
 
     private void seedDepartments() {

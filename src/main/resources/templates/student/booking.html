@@ -13,7 +13,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h4 class="mb-3">Đặt lịch cố vấn học tập</h4>
-                    <p class="text-secondary">Thực hiện theo thứ tự: chọn khoa/ngành, chọn giảng viên, chọn thời gian.</p>
+                    <p class="text-secondary">Thực hiện theo thứ tự: chọn khoa/ngành → giảng viên → ngày → khung giờ.</p>
 
                     <form th:action="@{/student/appointments/new}" method="get" class="mb-4">
                         <label class="form-label">Khoa/Ngành</label>
@@ -26,15 +26,20 @@
                         </select>
                     </form>
 
+                    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
                     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-                    <form th:if="${selectedDeptId != null}" th:action="@{/student/appointments/save}" method="post" class="row g-3">
+                    <form th:if="${selectedDeptId != null}"
+                          th:action="@{/student/appointments/save}"
+                          th:object="${booking}"
+                          method="post"
+                          class="row g-3">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <input type="hidden" name="departmentId" th:value="${selectedDeptId}">
+                        <input type="hidden" th:field="*{departmentId}">
 
                         <div class="col-12">
                             <label class="form-label">Giảng viên</label>
-                            <select class="form-select" name="lecturerId" required>
+                            <select class="form-select" th:field="*{lecturerId}" required>
                                 <option value="">-- Chọn giảng viên --</option>
                                 <option th:each="l : ${lecturers}" th:value="${l.id}"
                                         th:text="${l.user.profile != null ? l.user.profile.fullName : 'Chưa cập nhật tên'}"></option>
@@ -42,15 +47,15 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Ngày</label>
-                            <input type="date" class="form-control" name="appointmentDate" required>
+                            <input type="date" class="form-control" th:field="*{appointmentDate}" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Từ giờ</label>
-                            <input type="time" class="form-control" name="startTime" required>
+                            <input type="time" class="form-control" th:field="*{startTime}" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Đến giờ</label>
-                            <input type="time" class="form-control" name="endTime" required>
+                            <input type="time" class="form-control" th:field="*{endTime}" required>
                         </div>
                         <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end mt-2">
                             <a th:href="@{/dashboard}" class="btn btn-outline-secondary">Quay lại</a>
