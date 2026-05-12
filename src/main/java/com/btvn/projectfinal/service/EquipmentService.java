@@ -17,6 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+/**
+ * Nghiệp vụ thiết bị (CORE-04): lưu / cập nhật / xóa có kiểm tra tên trùng và ràng buộc phiếu mượn.
+ * <p>Dữ liệu nền (khoa, loại phòng) chỉ được <em>đọc</em> qua repository — không xóa seed trên UI vì
+ * các bảng đó thường được thiết bị / phiếu mượn tham chiếu; xóa tay dễ làm hỏng khóa ngoại hoặc sai ngữ cảnh phân loại.
+ */
 @Service
 @RequiredArgsConstructor
 public class EquipmentService {

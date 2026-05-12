@@ -35,7 +35,7 @@ public class AuthController {
     private final AuthService authService;
     private final DepartmentRepository departmentRepository;
     private final AuthenticationManager authenticationManager;
-
+    private final UserRepository userRepository;
     @GetMapping("/login")
     public String loginPage(Model model) {
         model.addAttribute("loginDTO", new LoginDTO());
@@ -48,10 +48,18 @@ public class AuthController {
             BindingResult bindingResult,
             Model model,
             HttpServletRequest request) {
+        if (dto.getUsername() == null || "".equals(dto.getUsername())) {
+                dto.setUsername(dto.getUsername().trim());
+        }
+
+        if (dto.getPassword() == null || "".equals(dto.getPassword())) {
+            dto.setPassword(dto.getPassword().trim());
+        }
 
         if (bindingResult.hasErrors()) {
             return "auth/login";
         }
+
 
         try {
             UsernamePasswordAuthenticationToken token =
@@ -69,7 +77,13 @@ public class AuthController {
             return "redirect:/dashboard";
 
         } catch (BadCredentialsException e) {
-            model.addAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng!");
+//            model.addAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng!");
+            String name = dto.getUsername() != null ? dto.getUsername() : "";
+            if (userRepository.existsByUsername(name)) {
+                model.addAttribute("loginUserError", "Tên đăng nhập không tồn tại");
+            }else {
+                model.addAttribute("loginPasswordError", "Mật khẩu không tồn tại");
+            }
             model.addAttribute("loginDTO", dto);
             return "auth/login";
         } catch (DisabledException e) {

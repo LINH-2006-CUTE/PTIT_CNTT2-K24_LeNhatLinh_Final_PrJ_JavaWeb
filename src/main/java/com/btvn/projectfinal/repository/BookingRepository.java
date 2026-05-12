@@ -29,6 +29,7 @@ public interface BookingRepository extends JpaRepository<Appointment, Integer> {
 
     Optional<Appointment> findByIdAndStudent_Id(Integer id, Long studentId);
 
+    @EntityGraph(attributePaths = {"student", "student.profile", "lecturer", "lecturer.user"})
     Optional<Appointment> findByIdAndLecturer_Id(Integer id, Long lecturerId);
 
     /**

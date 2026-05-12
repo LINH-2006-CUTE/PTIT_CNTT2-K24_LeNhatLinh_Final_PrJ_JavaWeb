@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,5 +34,10 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT e FROM Equipment e WHERE e.id = :id")
     Optional<Equipment> findByIdForUpdate(@Param("id") Long id);
+
+    /** Cảnh báo tồn kho thấp: lọc + sắp xếp hoàn toàn trong JPQL (không duyệt từng dòng trong Java). */
+    @EntityGraph(attributePaths = {"department", "labRoomType"})
+    @Query("SELECT e FROM Equipment e WHERE e.quantity < :threshold ORDER BY e.quantity ASC")
+    List<Equipment> findByQuantityLessThanOrderByQuantityAsc(@Param("threshold") int threshold);
 }
 

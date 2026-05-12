@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+
 @Service
 @RequiredArgsConstructor
 public class BorrowingDispatchService {
@@ -24,21 +25,24 @@ public class BorrowingDispatchService {
 
     @Transactional(readOnly = true)
     public List<BorrowingRecord> listAwaitingDispatch() {
-        return borrowingRecordRepository.findPendingForDispatch(List.of(
-                BorrowingRecordStatus.CHO_CAP_PHAT,
-                BorrowingRecordStatus.WAITING_APPROVAL));
+        /* Chỉ phiếu đúng luồng SRS: GV chỉ định xong → "Chờ cấp phát" → Admin xác nhận. */
+        return borrowingRecordRepository.findPendingForDispatch(
+                List.of(BorrowingRecordStatus.CHO_CAP_PHAT));
     }
 
     /**
-     * Xác nhận xuất kho (một transaction).
-     * <p><b>Idempotency:</b> nếu phiếu đã {@code Đã cấp phát} → thoát ngay, không trừ kho lần 2
-     * (chống double-click / gửi trùng request).
-     * <p><b>Check-then-act:</b> khóa phiếu mượn trước; gom nhu cầu theo từng {@code equipment_id};
-     * khóa từng dòng {@link Equipment} theo thứ tự {@code id} tăng dần (tránh deadlock);
-     * kiểm tra đủ tồn cho <em>tất cả</em> món; chỉ khi đủ mới trừ — nếu thiếu một món thì ném lỗi
-     * và rollback toàn bộ (không trừ lẻ).
-     */
-    /**
+     * Xác nhận xuất kho (CORE-08) — một transaction {@code @Transactional}.
+     * <p><b>Idempotency (chống bấm đúp):</b> nếu phiếu đã ở trạng thái {@code Đã cấp phát}
+     * thì trả về {@code false} ngay, <em>không</em> trừ kho thêm lần nữa.
+     * <p><b>Check-then-act (toàn vẹn tồn kho):</b>
+     * <ol>
+     *   <li>{@code SELECT ... FOR UPDATE} trên phiếu mượn → các request khác chờ, tránh xử lý song song cùng một phiếu.</li>
+     *   <li>Gom số lượng cần theo từng {@code equipment_id} (nhiều dòng chi tiết cùng thiết bị).</li>
+     *   <li>Khóa từng dòng {@link Equipment} theo {@code id} tăng dần → giảm deadlock khi nhiều phiếu khác nhau.</li>
+     *   <li>Chỉ sau khi <em>tất cả</em> món đều đủ tồn mới trừ kho + đổi trạng thái phiếu; nếu thiếu một món
+     *       thì ném {@link IllegalStateException} → Spring rollback toàn bộ (không trừ lẻ từng món).</li>
+     * </ol>
+     *
      * @return {@code true} nếu vừa trừ kho và đổi trạng thái; {@code false} nếu phiếu đã cấp phát trước đó (idempotent).
      */
     @Transactional(rollbackFor = Exception.class)
@@ -51,9 +55,10 @@ public class BorrowingDispatchService {
             return false;
         }
 
-        if (!isAwaitingDispatch(record.getStatus())) {
+        if (!BorrowingRecordStatus.CHO_CAP_PHAT.equals(record.getStatus())) {
             throw new IllegalStateException(
-                    "Phiếu không ở trạng thái chờ cấp phát (hiện tại: " + record.getStatus() + ").");
+                    "Phiếu phải ở trạng thái \"" + BorrowingRecordStatus.CHO_CAP_PHAT
+                            + "\" mới được xác nhận xuất kho (hiện tại: " + record.getStatus() + ").");
         }
 
         List<BorrowingDetail> lines = record.getDetails();
@@ -98,10 +103,5 @@ public class BorrowingDispatchService {
         record.setStatus(BorrowingRecordStatus.DA_CAP_PHAT);
         borrowingRecordRepository.save(record);
         return true;
-    }
-
-    private static boolean isAwaitingDispatch(String status) {
-        return BorrowingRecordStatus.CHO_CAP_PHAT.equals(status)
-                || BorrowingRecordStatus.WAITING_APPROVAL.equals(status);
     }
 }

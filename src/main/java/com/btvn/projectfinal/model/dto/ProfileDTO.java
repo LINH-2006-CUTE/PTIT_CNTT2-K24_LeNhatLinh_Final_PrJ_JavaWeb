@@ -1,5 +1,6 @@
 package com.btvn.projectfinal.model.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data

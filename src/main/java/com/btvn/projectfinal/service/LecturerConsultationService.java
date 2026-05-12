@@ -58,6 +58,11 @@ public class LecturerConsultationService {
             throw new IllegalStateException("Buổi tư vấn không còn ở trạng thái chờ xử lý (đã đánh giá, đã hủy hoặc đã hoàn thành).");
         }
 
+        if (session.getStudent() == null) {
+            throw new IllegalStateException(
+                    "Buổi tư vấn không có sinh viên gắn kèm (dữ liệu mentoring_sessions.student_id). Không thể tạo phiếu mượn.");
+        }
+
         if (academicEvaluationRepository.existsByMentoringSession_Id(session.getId())) {
             throw new IllegalStateException("Buổi tư vấn đã được đánh giá trước đó.");
         }
@@ -87,9 +92,11 @@ public class LecturerConsultationService {
         record.setStatus(BorrowingRecordStatus.CHO_CAP_PHAT);
         borrowingRecordRepository.save(record);
 
+        User borrower = record.getStudent();
         for (Equipment equipment : equipments) {
             BorrowingDetail line = new BorrowingDetail();
             line.setBorrowingRecord(record);
+            line.setStudent(borrower);
             line.setEquipment(equipment);
             line.setQuantity(1);
             borrowingDetailRepository.save(line);

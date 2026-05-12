@@ -1,5 +1,6 @@
 package com.btvn.projectfinal.config;
 
+import com.btvn.projectfinal.model.BorrowingRecordStatus;
 import com.btvn.projectfinal.model.MentoringSessionStatus;
 import com.btvn.projectfinal.model.entity.*;
 import com.btvn.projectfinal.repository.*;
@@ -36,6 +37,7 @@ public class Data implements ApplicationRunner {
         seedLecturers();
         linkOrphanLecturerRoleUsers();
         normalizeLegacyMentoringStatuses();
+        normalizeLegacyBorrowingRecordStatuses();
     }
 
     /**
@@ -56,6 +58,24 @@ public class Data implements ApplicationRunner {
             }
         } catch (Exception ex) {
             log.warn("Không chuẩn hoá mentoring_sessions (bỏ qua nếu bảng chưa tồn tại): {}", ex.getMessage());
+        }
+    }
+
+    /**
+     * Phiếu mượn cũ dùng {@link BorrowingRecordStatus#WAITING_APPROVAL} — đồng bộ sang {@code Chờ cấp phát}
+     * để khớp luồng CORE-08 hiện tại.
+     */
+    private void normalizeLegacyBorrowingRecordStatuses() {
+        try {
+            int n = jdbcTemplate.update(
+                    "UPDATE borrowing_records SET status = ? WHERE status = ?",
+                    BorrowingRecordStatus.CHO_CAP_PHAT,
+                    BorrowingRecordStatus.WAITING_APPROVAL);
+            if (n > 0) {
+                log.info("Chuẩn hoá phiếu mượn: {} dòng Waiting_Approval → Chờ cấp phát.", n);
+            }
+        } catch (Exception ex) {
+            log.warn("Không chuẩn hoá borrowing_records: {}", ex.getMessage());
         }
     }
 

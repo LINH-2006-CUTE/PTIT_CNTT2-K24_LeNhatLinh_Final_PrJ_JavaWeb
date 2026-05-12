@@ -22,6 +22,71 @@
 
 <div class="container py-4">
     <h4 class="mb-4">Quản trị hệ thống</h4>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">Top 5 giảng viên — số buổi tư vấn (mentoring_sessions)</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                            <tr><th>#</th><th>Giảng viên</th><th class="text-end">Số buổi</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="row, it : ${topLecturers}">
+                                <td th:text="${it.index + 1}">1</td>
+                                <td th:text="${row.lecturerName}">—</td>
+                                <td class="text-end" th:text="${row.totalSessions}">0</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(topLecturers)}">
+                                <td colspan="3" class="text-secondary text-center py-3">Chưa có dữ liệu buổi tư vấn.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-2 py-2 border-top bg-white" style="height: 118px;">
+                        <p class="small text-muted mb-1" style="font-size: 0.72rem;">Biểu đồ nhỏ (cùng dữ liệu bảng).</p>
+                        <div style="height: 88px;">
+                            <canvas id="chartTopLecturers"></canvas>
+                        </div>
+                    </div>
+                    <p class="small text-secondary px-3 py-2 mb-0">Thống kê được tính trong MySQL (GROUP BY + COUNT + ORDER BY + LIMIT), không cộng dồn bằng vòng lặp Java.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold" th:text="${'Cảnh báo tồn kho thấp (dưới ' + lowStockThreshold + ')'}">Cảnh báo tồn kho</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                            <tr><th>Tên thiết bị</th><th class="text-end">Tồn</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="equipment : ${lowStockEquipments}">
+                                <td th:text="${equipment.name}">—</td>
+                                <td class="text-end"><span class="badge text-bg-warning" th:text="${equipment.quantity}">0</span></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(lowStockEquipments)}">
+                                <td colspan="2" class="text-secondary text-center py-3">Không có thiết bị nào dưới ngưỡng.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-2 py-2 border-top bg-white" style="height: 118px;">
+                        <p class="small text-muted mb-1" style="font-size: 0.72rem;">Biểu đồ nhỏ (cùng JPQL).</p>
+                        <div style="height: 88px;">
+                            <canvas id="chartLowStock"></canvas>
+                        </div>
+                    </div>
+                    <p class="small text-secondary px-3 py-2 mb-0">Danh sách lọc bằng một câu JPQL trên bảng equipments (quantity nhỏ hơn ngưỡng cấu hình).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row g-3">
         <div class="col-md-4">
             <div class="card border-0 shadow-sm h-100">
@@ -59,16 +124,91 @@
                 </div>
             </div>
         </div>
-<!--        <div class="col-md-4">-->
-<!--            <div class="card border-0 shadow-sm h-100">-->
-<!--                <div class="card-body">-->
-<!--                    <h5 class="card-title">Dữ liệu nền</h5>-->
-<!--                    <p class="text-secondary">Xem khoa và loại phòng lab (chỉ đọc).</p>-->
-<!--                    <a th:href="@{/admin/reference}" class="btn btn-outline-primary">Mở danh sách</a>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Dữ liệu nền</h5>
+                    <p class="text-secondary">Xem khoa và loại phòng lab (chỉ đọc — không Thêm/Xóa trên UI).</p>
+                    <a th:href="@{/admin/reference}" class="btn btn-outline-primary">Mở danh sách</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const topLabels = [
+        /*[# th:each="row : ${topLecturers}"]*/
+        /*[[${row.lecturerName}]]*/,
+        /*[/]*/
+    ];
+    const topCounts = [
+        /*[# th:each="row : ${topLecturers}"]*/
+        /*[[${row.totalSessions}]]*/,
+        /*[/]*/
+    ];
+    const lowLabels = [
+        /*[# th:each="equipment : ${lowStockEquipments}"]*/
+        /*[[${equipment.name}]]*/,
+        /*[/]*/
+    ];
+    const lowQty = [
+        /*[# th:each="equipment : ${lowStockEquipments}"]*/
+        /*[[${equipment.quantity}]]*/,
+        /*[/]*/
+    ];
+    const lowThreshold = /*[[${lowStockThreshold}]]*/ 5;
+
+    function renderBarChart(canvasId, labels, data, label, colorRgb) {
+        const el = document.getElementById(canvasId);
+        if (!el || labels.length === 0) {
+            return;
+        }
+        const ctx = el.getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    maxBarThickness: 22,
+                    backgroundColor: 'rgba(' + colorRgb + ', 0.55)',
+                    borderColor: 'rgba(' + colorRgb + ', 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: { top: 2, right: 4, bottom: 2, left: 4 } },
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, font: { size: 9 }, maxTicksLimit: 5 }
+                    },
+                    x: {
+                        ticks: {
+                            font: { size: 9 },
+                            maxRotation: 40,
+                            minRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 8
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    renderBarChart('chartTopLecturers', topLabels, topCounts, 'Số buổi tư vấn', '13, 110, 253');
+    renderBarChart('chartLowStock', lowLabels, lowQty, 'Tồn (dưới ngưỡng ' + lowThreshold + ')', '255, 193, 7');
+    /*]]>*/
+</script>
 </body>
 </html>
