@@ -19,11 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.NoSuchElementException;
 
-/**
- * CORE-04 — CRUD thiết bị. URL nằm dưới {@code /admin/**} nên đã được
- * {@link com.btvn.projectfinal.config.SecurityConfig} giới hạn chỉ {@code ROLE_ADMIN}.
- * Khoa / loại phòng lab chỉ chọn từ dữ liệu nền (không có Thêm/Xóa ở đây).
- */
 @Controller
 @RequestMapping("/admin/equipment")
 @RequiredArgsConstructor

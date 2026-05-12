@@ -19,6 +19,5 @@ public class EvaluationRequestDTO {
     @NotBlank(message = "Vui lòng nhập nội dung đánh giá")
     private String comment;
 
-    /** Để trống hoặc không chọn thiết bị → chỉ lưu đánh giá, không tạo phiếu mượn. */
     private List<Long> listEquipmentIds = new ArrayList<>();
 }

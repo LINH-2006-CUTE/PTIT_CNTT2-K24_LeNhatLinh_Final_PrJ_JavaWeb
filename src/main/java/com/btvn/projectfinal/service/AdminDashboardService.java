@@ -10,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Dashboard Admin: chỉ gọi Repository — mọi phép đếm / lọc / TOP N đều do database xử lý.
- */
 @Service
 public class AdminDashboardService {
 

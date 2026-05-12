@@ -8,16 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Thống kê cho Admin: toàn bộ gộp nhóm / sắp xếp / giới hạn TOP 5 xử lý ở DB (không lặp trong Java để cộng dồn).
- */
 @Repository
 public interface AdminDashboardRepository extends JpaRepository<Appointment, Integer> {
 
-    /**
-     * Top 5 giảng viên có nhiều buổi tư vấn ({@code mentoring_sessions}) nhất.
-     * <p>SQL: {@code JOIN} + {@code GROUP BY} + {@code COUNT} + {@code ORDER BY} + {@code LIMIT 5}.
-     */
     @Query(value = """
             SELECT
                 l.id AS lecturerId,

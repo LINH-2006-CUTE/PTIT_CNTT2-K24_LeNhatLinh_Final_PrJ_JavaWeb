@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * CORE-08 — chỉ ROLE_ADMIN (đã cấu hình trong {@code SecurityConfig} cho {@code /admin/**}).
- */
+
 @Controller
 @RequestMapping("/admin/borrowing")
 @RequiredArgsConstructor

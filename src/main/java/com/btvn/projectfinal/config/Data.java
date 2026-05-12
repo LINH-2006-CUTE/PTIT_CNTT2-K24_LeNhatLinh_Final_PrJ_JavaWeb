@@ -34,15 +34,12 @@ public class Data implements ApplicationRunner {
         seedDepartments();
         seedLabRoomTypes();
         seedAdminAccount();
-        seedLecturers();
+//        seedLecturers();
         linkOrphanLecturerRoleUsers();
         normalizeLegacyMentoringStatuses();
         normalizeLegacyBorrowingRecordStatuses();
     }
 
-    /**
-     * Bản ghi đặt lịch cũ dùng tiếng Việt — trang GV chỉ tìm {@code Pending} nên sẽ trống nếu không đồng bộ.
-     */
     private void normalizeLegacyMentoringStatuses() {
         try {
             int n = jdbcTemplate.update(
@@ -61,10 +58,6 @@ public class Data implements ApplicationRunner {
         }
     }
 
-    /**
-     * Phiếu mượn cũ dùng {@link BorrowingRecordStatus#WAITING_APPROVAL} — đồng bộ sang {@code Chờ cấp phát}
-     * để khớp luồng CORE-08 hiện tại.
-     */
     private void normalizeLegacyBorrowingRecordStatuses() {
         try {
             int n = jdbcTemplate.update(
@@ -79,10 +72,6 @@ public class Data implements ApplicationRunner {
         }
     }
 
-    /**
-     * Tài khoản có role LECTURER nhưng chưa có dòng {@code lecturers} (đăng ký cũ / nhập tay DB)
-     * → tạo bản ghi để tránh lỗi khi vào chức năng giảng viên.
-     */
     private void linkOrphanLecturerRoleUsers() {
         Department defaultDept = departmentRepository.findByCode("CNTT")
                 .orElseGet(() -> departmentRepository.findAll().stream().findFirst().orElse(null));
@@ -130,33 +119,33 @@ public class Data implements ApplicationRunner {
         log.info("Seeded {} lab room types", types.size());
     }
 
-    private void seedLecturers() {
-        if (userRepository.existsByUsername("giangvien01")) {
-            return;
-        }
-        Department cntt = departmentRepository.findByCode("CNTT")
-                .orElseThrow(() -> new RuntimeException("Chưa có khoa CNTT"));
-// tạo user cho gv
-        User gv = new User();
-        gv.setUsername("giangvien01");
-        gv.setPassword(passwordEncoder.encode("123456"));
-        gv.setRole(User.Role.LECTURER);
-        userRepository.save(gv);
-// tạo profile cho gv
-        UserProfile profile = new UserProfile();
-        profile.setUser(gv);
-        profile.setFullName("Thầy Nguyễn Văn A");
+//    private void seedLecturers() {
+//        if (userRepository.existsByUsername("giangvien01")) {
+//            return;
+//        }
+//        Department cntt = departmentRepository.findByCode("CNTT")
+//                .orElseThrow(() -> new RuntimeException("Chưa có khoa CNTT"));
 
-        profileRepository.save(profile);
+//        User gv = new User();
+//        gv.setUsername("giangvien01");
+//        gv.setPassword(passwordEncoder.encode("123456"));
+//        gv.setRole(User.Role.LECTURER);
+//        userRepository.save(gv);
 
-        Lecturer lecturer = new Lecturer();
-        lecturer.setUser(gv);
-        lecturer.setDepartment(cntt);
-        lecturer.setTitle("Thạc sĩ");
-        lecturer.setSpecialization("Lập trình Java");
-        lecturerRepository.save(lecturer);
-        log.info("Seeded lecturer: Thầy Nguyễn Văn A thuộc khoa CNTT");
-    }
+//        UserProfile profile = new UserProfile();
+//        profile.setUser(gv);
+//        profile.setFullName("Thầy Nguyễn Văn A");
+//
+//        profileRepository.save(profile);
+//
+//        Lecturer lecturer = new Lecturer();
+//        lecturer.setUser(gv);
+//        lecturer.setDepartment(cntt);
+//        lecturer.setTitle("Thạc sĩ");
+//        lecturer.setSpecialization("Lập trình Java");
+//        lecturerRepository.save(lecturer);
+//        log.info("Seeded lecturer: Thầy Nguyễn Văn A thuộc khoa CNTT");
+//    }
 
     private void seedAdminAccount() {
         if (userRepository.existsByUsername("admin")) return;

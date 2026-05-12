@@ -4,16 +4,17 @@ import com.btvn.projectfinal.model.dto.LoginDTO;
 import com.btvn.projectfinal.model.dto.RegisterDTO;
 import com.btvn.projectfinal.model.entity.User;
 import com.btvn.projectfinal.repository.DepartmentRepository;
+import com.btvn.projectfinal.repository.UserRepository;
 import com.btvn.projectfinal.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;       // ✅ đúng
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;                        // ✅ đúng
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -74,21 +75,26 @@ public class AuthController {
                     SecurityContextHolder.getContext()
             );
 
+
+
             return "redirect:/dashboard";
 
         } catch (BadCredentialsException e) {
-//            model.addAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng!");
-            String name = dto.getUsername() != null ? dto.getUsername() : "";
-            if (userRepository.existsByUsername(name)) {
-                model.addAttribute("loginUserError", "Tên đăng nhập không tồn tại");
-            }else {
-                model.addAttribute("loginPasswordError", "Mật khẩu không tồn tại");
-            }
+            model.addAttribute("errorMessage", "Tên đăng nhập không đúng");
+
+
+
             model.addAttribute("loginDTO", dto);
             return "auth/login";
         } catch (DisabledException e) {
             model.addAttribute("errorMessage", "Tài khoản của bạn đã bị khóa!");
             model.addAttribute("loginDTO", dto);
+            //            String name = dto.getUsername() != null ? dto.getUsername() : "";
+//            if (!userRepository.existsByUsername(name)) {
+//                model.addAttribute("loginUserError", "Tên đăng nhập không tồn tại");
+//            }else {
+//                model.addAttribute("loginPasswordError", "Mật khẩu không tồn tại");
+//            }
             return "auth/login";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Đăng nhập thất bại. Vui lòng thử lại.");
